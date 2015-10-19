@@ -17,6 +17,7 @@ public class HTTPRequest implements Runnable{
 	private String requestLine;
 	private String requestMethod, requestResource, httpVersion;
 
+
 	private enum HTTPRequestMethod {
 		GET, POST, PUT, DELETE
 	};

@@ -1,0 +1,32 @@
+<html>
+	<head>
+	<script type="text/javascript">
+		function setResponseHeaders(){
+			var req = new XMLHttpRequest();
+			req.open('GET', document.location, false);
+			req.send(null);
+			var headers = req.getAllResponseHeaders().toLowerCase();
+			document.getElementById('responseHeaders').innerHTML += headers;
+		}
+	</script>
+	<style>
+		.title{
+			font: normal bold 20px/18px verdana;
+			margin: 12px 12px;
+		}
+		#requestHeaders, #responseHeaders{
+	        font: normal 12px/18px verdana;
+		    white-space: pre;
+		    background-color: #F3B262;
+		    border: 2px black solid;
+		    padding: 10px;
+		}
+	</style>
+	</head>
+	<body onload="setResponseHeaders()">
+		<div class="title">Request Headers :</div>
+		<div id="requestHeaders">%s</div>
+		<div class="title">Response Headers :</div>
+		<div id="responseHeaders"></div>
+	</body>
+</html>

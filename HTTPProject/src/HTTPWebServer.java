@@ -5,23 +5,35 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class HTTPWebServer {
+
+	private final ServerSocket server;
+
 	int requestCount = 0;
 	int requestId = 0;
+	private int serverPort = 8080;
 
 	public static void main(String[] args) {
+
 		try {
 			showWelcomeMessage();
-			new HTTPWebServer();
+			new HTTPWebServer(args);
 		} catch (IOException e) {
 			HTTPWebServer.logMessage("Error in starting the WebServer : "  + e);
 		}
 	}
 
-	public HTTPWebServer() throws IOException{
-		final ServerSocket server;
+	public HTTPWebServer(String[] args) throws IOException{
 
-		server = new ServerSocket(54322);
-		logMessage("WebServer Initiated. Listening to Port 54322");
+		if(args.length > 0){
+			try{
+				serverPort = Integer.parseInt(args[0].trim());
+			} catch(NumberFormatException e){
+				logMessage("Error in reading server port. Defaulting to 8080");
+			}
+		}
+
+		server = new ServerSocket(serverPort);
+		logMessage("WebServer Initiated. Listening to Port : " + serverPort);
 
 		Runtime.getRuntime().addShutdownHook(new Thread()
 		{
@@ -44,7 +56,8 @@ public class HTTPWebServer {
 				try {
 					incomingSocket = server.accept();
 
-					logMessage("New Request Initiated with Id : " + (++requestId));
+					++requestId;
+
 					HTTPRequest request = new HTTPRequest(incomingSocket,requestId);
 					Thread requestThread = new Thread(request);
 					requestThread.start();
@@ -63,6 +76,7 @@ public class HTTPWebServer {
 	static SimpleDateFormat sdt = new SimpleDateFormat("[yyyy/MM/dd HH:mm:ss] : ");
 
 	static void logMessage(String msg){
+
 		Calendar c = Calendar.getInstance();
 		System.out.println(sdt.format(c.getTime()) + msg);
 	}

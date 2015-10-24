@@ -40,6 +40,8 @@ public class HTTPRequest implements Runnable{
 	public HTTPRequest(Socket s, int id) {
 		this.socket = s;
 		this.requestId = id;
+
+		logMessage("New Request Initiated with Id : " + id);
 	}
 
 	@Override
@@ -61,6 +63,8 @@ public class HTTPRequest implements Runnable{
 
 				while((requestHeaderLines = bReader.readLine()).length() != 0)
 					headerBuffer.append(requestHeaderLines.trim() + "\n");
+
+				System.out.println(headerBuffer.toString());
 			} else {
 				return;
 			}
@@ -129,6 +133,13 @@ public class HTTPRequest implements Runnable{
 			output.write(entityBody.getBytes());
 		} catch (Exception e) {
 			logMessage("Error in sending response : " + e);
+		} finally{
+			try {
+				output.flush();
+				output.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

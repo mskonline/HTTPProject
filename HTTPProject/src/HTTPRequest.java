@@ -101,6 +101,7 @@ public class HTTPRequest implements Runnable{
 		try{
 			bReader.close();
 			socket.close();
+			logMessage("Closed request with Id : " + requestId);
 		} catch(Exception e){
 			logMessage("Error in closing socket/streams : " + e);
 		}
@@ -118,16 +119,17 @@ public class HTTPRequest implements Runnable{
 			String entityBody = getFileAsString(requestResource);
 			output = new DataOutputStream(socket.getOutputStream());
 
-			String contentType;
+			String contentType, responseLine;
 
 			if(resourseExists){
 				contentType = "Content-type : " + getContentType(requestResource) + CRLF;
-				output.write(HTTP200.getBytes());
+				responseLine = HTTP200 + CRLF;
 			} else {
-				contentType = "Content-type : " + getContentType("404.html")+ CRLF;
-				output.write(HTTP404.getBytes());
+				contentType = "Content-type : " + getContentType("404.html") + CRLF;
+				responseLine = HTTP404 + CRLF;
 			}
 
+			output.write(responseLine.getBytes());
 			output.write(contentType.getBytes());
 			output.write(CRLF.getBytes());
 			output.write(entityBody.getBytes());

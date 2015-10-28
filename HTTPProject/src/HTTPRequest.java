@@ -123,10 +123,10 @@ public class HTTPRequest implements Runnable{
 
 			if(resourseExists){
 				contentType = "Content-type : " + getContentType(requestResource) + CRLF;
-				responseLine = HTTP200 + CRLF;
+				responseLine = HTTP200;
 			} else {
 				contentType = "Content-type : " + getContentType("404.html") + CRLF;
-				responseLine = HTTP404 + CRLF;
+				responseLine = HTTP404;
 			}
 
 			output.write(responseLine.getBytes());

@@ -6,4 +6,4 @@ IF NOT EXIST "HTTPWebServer.class" (
 )
 
 ECHO Starting HTTPWebServer...
-java -cp . HTTPWebServer
+java -cp . HTTPWebServer %1

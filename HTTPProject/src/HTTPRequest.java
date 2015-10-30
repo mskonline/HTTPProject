@@ -13,6 +13,8 @@ import java.util.Calendar;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
+import com.oracle.jrockit.jfr.RequestableEvent;
+
 public class HTTPRequest implements Runnable{
 
 	private final Socket socket;
@@ -41,9 +43,14 @@ public class HTTPRequest implements Runnable{
 		this.socket = s;
 		this.requestId = id;
 
-		logMessage("New Request Initiated with Id : " + id);
+		logMessage("New Request Initiated [Id : " + id + "]");
 	}
 
+	/**
+	 *
+	 * Reads the HTTP request and sends appropriate HTTP response
+	 *
+	 */
 	@Override
 	public void run() {
 		bReader = null;
@@ -57,13 +64,14 @@ public class HTTPRequest implements Runnable{
 			requestLine = bReader.readLine();
 
 			if(requestLine != null){
-				logMessage("Processing request '" + requestLine + "' with Id : " + requestId);
+				logMessage("Processing request '" + requestLine + "' [Id : " + requestId + "]");
 
 				headerBuffer.append(requestLine.trim() + "\n");
 
 				while((requestHeaderLines = bReader.readLine()).length() != 0)
 					headerBuffer.append(requestHeaderLines.trim() + "\n");
 
+				logMessage("Header details : ");
 				System.out.println(headerBuffer.toString());
 			} else {
 				return;
@@ -84,6 +92,7 @@ public class HTTPRequest implements Runnable{
 		// Respond to the HTTP request
 		switch(HTTPRequestMethod.valueOf(requestMethod)){
 			case GET:
+					logMessage("Getting requested resource : " + requestResource);
 					getResourse();
 				break;
 			case POST:
@@ -97,21 +106,29 @@ public class HTTPRequest implements Runnable{
 			default:
 		}
 
+		// Print the specs
+		printSpecs();
+
 		// Finally, close all the streams and the socket
 		try{
 			bReader.close();
 			socket.close();
-			logMessage("Closed request with Id : " + requestId);
+			logMessage("Closed request [Id : " + requestId + "]");
 		} catch(Exception e){
 			logMessage("Error in closing socket/streams : " + e);
 		}
 	}
 
+	/**
+	 *
+	 * Reads the requested resources and sends it to the client
+	 *
+	 */
 	private void getResourse(){
 		output = null;
 
 		if(requestResource.equalsIgnoreCase("./")){
-			outputHeaderLines();
+			getHeaderDetails();
 			return;
 		}
 
@@ -125,6 +142,7 @@ public class HTTPRequest implements Runnable{
 				contentType = "Content-type : " + getContentType(requestResource) + CRLF;
 				responseLine = HTTP200;
 			} else {
+				logMessage("Requested resource [" + requestResource + "] not found");
 				contentType = "Content-type : " + getContentType("404.html") + CRLF;
 				responseLine = HTTP404;
 			}
@@ -145,7 +163,13 @@ public class HTTPRequest implements Runnable{
 		}
 	}
 
-	private void outputHeaderLines(){
+	/**
+	 *
+	 *	Reads the ./ resource request and sends all the header information of the request
+	 *	to the client
+ 	 *
+	 */
+	private void getHeaderDetails(){
 		try {
 			String outputData = getFileAsString("ReadHeaders.html");
 			String entityBody = String.format(outputData, headerBuffer.toString());
@@ -168,18 +192,39 @@ public class HTTPRequest implements Runnable{
 		}
 	}
 
+	private void printSpecs(){
+		System.out.println("\n\n***************************************");
+		System.out.println("Remote Hostname : " + socket.getRemoteSocketAddress().toString());
+		System.out.println("***************************************");
+	}
+
+	/**
+	 *
+	 * Parse the request line of the incoming request
+	 *
+	 */
 	private void parseRequestLine(){
 		StringTokenizer st = new StringTokenizer(requestLine, DELIM);
+		String pathToken, resource;
 
 		if(st.countTokens() == 3){
 			requestMethod = st.nextToken();
-			requestResource = "." + st.nextToken();
+
+			resource = st.nextToken().trim();
+			pathToken = resource.startsWith("/") ? "." : "./";
+			requestResource = pathToken + resource;
+
 			httpVersion = st.nextToken();
 		}
-
-		logMessage(requestMethod + " " + requestResource + " " + httpVersion);
 	}
 
+	/**
+	 *
+	 * Read the requested file (resource) and return it as string
+	 *
+	 * @param fileName
+	 * @return
+	 */
 	private String getFileAsString(String fileName){
 		URL path = ClassLoader.getSystemResource(fileName);
 
@@ -218,6 +263,13 @@ public class HTTPRequest implements Runnable{
 	    }
 	}
 
+	/**
+	 *
+	 * Return the content-type of the out going data
+	 *
+	 * @param fileName
+	 * @return
+	 */
 	private String getContentType(String fileName){
 
 		if(fileName.endsWith("html") || fileName.endsWith("htm"))

@@ -6,4 +6,4 @@ IF NOT EXIST "HTTPWebClient.class" (
 )
 
 ECHO Starting HTTPClient...
-java -cp . HTTPWebClient %1 %2
+java -cp . HTTPWebClient %1 %2 %3

@@ -30,6 +30,9 @@ public class HTTPWebServer {
 			} catch(NumberFormatException e){
 				logMessage("Error in reading server port. Defaulting to 8080");
 			}
+		} else {
+			System.out.println("Usage : startHTTPWebServer.bat <port>");
+			logMessage("Defaulting to 8080");
 		}
 
 		server = new ServerSocket(serverPort);

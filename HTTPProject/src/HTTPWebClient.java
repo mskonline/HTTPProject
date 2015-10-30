@@ -21,6 +21,8 @@ public class HTTPWebClient {
 	private BufferedReader input = null;
 	private DataOutputStream output = null;
 
+	long startTime, firstDataRecvTime = 0;
+
 	public static void main(String[] args) {
 		showWelcomeMessage();
 		new HTTPWebClient(args);
@@ -42,6 +44,9 @@ public class HTTPWebClient {
 			} catch(NumberFormatException e){
 				logMessage("Error in reading server port. Defaulting to 8080");
 			}
+		} else {
+			System.out.println("Usage : startHTTPWebClient.bat <host> <port> <resourse>");
+			logMessage("Defaulting to host:localhost. port:8080, resource:/");
 		}
 
 		// Open the socket
@@ -60,6 +65,9 @@ public class HTTPWebClient {
 
 		// Read the HTTP response
 		readResponse();
+
+		// Print the specifications
+		printSpecs();
 
 		// Finally close the socket and streams
 		try {
@@ -94,8 +102,11 @@ public class HTTPWebClient {
 	private void sendRequest(){
 
 		try {
+			logMessage("Sending request : " + getRequestLine());
+
 			output.write(getRequestLine().getBytes());
 			output.write(CRLF.getBytes());
+			startTime = System.currentTimeMillis();
 		} catch (Exception e) {
 			logMessage("Error in sending response : " + e);
 		}
@@ -113,17 +124,30 @@ public class HTTPWebClient {
 			while(true){
 				String str = input.readLine();
 
-				if(str != null)
+				if(str != null){
+
+					// Record the time of the first data
+					if(firstDataRecvTime == 0)
+						firstDataRecvTime = System.currentTimeMillis();
+
 					responseBuffer.append("\n" + str);
-				else
+				} else
 					break;
 			}
 
+			logMessage("Received response :- ");
 			System.out.println(responseBuffer.toString());
 		} catch (IOException e) {
 			logMessage("Error in reading response : " + e);
 		}
 
+	}
+
+	private void printSpecs(){
+		System.out.println("\n\n***************************************");
+		System.out.println("RTT : " + ((firstDataRecvTime - startTime)/1000.0) + " secs");
+		System.out.println("Remote Hostname : " + httpSocket.getRemoteSocketAddress().toString());
+		System.out.println("***************************************");
 	}
 
 	/**

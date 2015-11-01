@@ -1,3 +1,11 @@
+/**
+ *
+ * @author Sai Kumar Manakan
+ * @email saikumar.manakan@mavs.uta.edu
+ * @uta_id 1001236131
+ *
+ */
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;

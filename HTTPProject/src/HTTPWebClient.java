@@ -1,9 +1,9 @@
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -15,7 +15,6 @@ public class HTTPWebClient {
 	private int hostPort = 8080;
 	private String requestedResource = "/";
 
-	private final String DELIM = " ";
 	private final String CRLF = "\r\n";
 
 	private BufferedReader input = null;
@@ -143,11 +142,16 @@ public class HTTPWebClient {
 
 	}
 
+	DecimalFormat df = new DecimalFormat("#.0000000");
+
 	private void printSpecs(){
-		System.out.println("\n\n***************************************");
-		System.out.println("RTT : " + ((firstDataRecvTime - startTime)/1000.0) + " secs");
+
+		double RTT = (double)((firstDataRecvTime - startTime)/1000.0);
+
+		System.out.println("\n\n*****************Server Details*****************");
 		System.out.println("Remote Hostname : " + httpSocket.getRemoteSocketAddress().toString());
-		System.out.println("***************************************");
+		System.out.println("RTT : " + df.format(RTT) + " secs");
+		System.out.println("************************************************");
 	}
 
 	/**

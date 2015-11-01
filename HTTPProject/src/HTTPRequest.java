@@ -1,7 +1,6 @@
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -13,8 +12,6 @@ import java.util.Calendar;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
-import com.oracle.jrockit.jfr.RequestableEvent;
-
 public class HTTPRequest implements Runnable{
 
 	private final Socket socket;
@@ -22,7 +19,7 @@ public class HTTPRequest implements Runnable{
 
 	private String requestLine;
 	private StringBuffer headerBuffer;
-	private String requestMethod, requestResource, httpVersion;
+	private String requestMethod, requestResource, httpVersion = "HTTP/1.1";
 
 	private boolean resourseExists = true;
 
@@ -36,8 +33,8 @@ public class HTTPRequest implements Runnable{
 	private final String DELIM = " ";
 	private final String CRLF = "\r\n";
 
-	private String HTTP200 = "HTTP/1.1 200 OK" + CRLF;
-	private String HTTP404 = "HTTP/1.1 404 Not Found" + CRLF;
+	private String HTTP200 = httpVersion + DELIM + "200" + DELIM + "OK" + CRLF;
+	private String HTTP404 = httpVersion + DELIM + "404" + DELIM + "Not Found" + CRLF;
 
 	public HTTPRequest(Socket s, int id) {
 		this.socket = s;
@@ -53,6 +50,52 @@ public class HTTPRequest implements Runnable{
 	 */
 	@Override
 	public void run() {
+
+		// Read the request headers
+		boolean isRead = readRequestHeaders();
+
+		if(isRead){
+			// Parse the request line
+			parseRequestLine();
+
+			// Respond to the HTTP request
+			switch(HTTPRequestMethod.valueOf(requestMethod)){
+				case GET:
+						logMessage("Getting requested resource : " + requestResource);
+						getResourse();
+					break;
+				case POST:
+					break;
+				case PUT:
+					break;
+				case DELETE:
+					break;
+				case HEAD:
+					break;
+				default:
+			}
+
+			// Print the specs
+			printSpecs();
+		}
+
+		// Finally, close all the streams and the socket
+		try{
+			bReader.close();
+			socket.close();
+			logMessage("Closed request [Id : " + requestId + "]");
+		} catch(Exception e){
+			logMessage("Error in closing socket/streams : " + e);
+		}
+	}
+
+	/**
+	 *
+	 * Read the request headers
+	 *
+	 */
+	private boolean readRequestHeaders(){
+
 		bReader = null;
 
 		// Read the HTTP request header
@@ -74,49 +117,15 @@ public class HTTPRequest implements Runnable{
 				logMessage("Header details : ");
 				System.out.println(headerBuffer.toString());
 			} else {
-				return;
+				logMessage("Nothing to read in this request. Closing the connection");
+				return false;
 			}
 		} catch (Exception e) {
 			logMessage("Error in reading header : " + e);
-			try {
-				socket.close();
-				return;
-			} catch (Exception e1) {
-				logMessage("Error in closing socket : " + e1);
-			}
+			return false;
 		}
 
-		// Parse the request line
-		parseRequestLine();
-
-		// Respond to the HTTP request
-		switch(HTTPRequestMethod.valueOf(requestMethod)){
-			case GET:
-					logMessage("Getting requested resource : " + requestResource);
-					getResourse();
-				break;
-			case POST:
-				break;
-			case PUT:
-				break;
-			case DELETE:
-				break;
-			case HEAD:
-				break;
-			default:
-		}
-
-		// Print the specs
-		printSpecs();
-
-		// Finally, close all the streams and the socket
-		try{
-			bReader.close();
-			socket.close();
-			logMessage("Closed request [Id : " + requestId + "]");
-		} catch(Exception e){
-			logMessage("Error in closing socket/streams : " + e);
-		}
+		return true;
 	}
 
 	/**
@@ -144,6 +153,7 @@ public class HTTPRequest implements Runnable{
 			} else {
 				logMessage("Requested resource [" + requestResource + "] not found");
 				contentType = "Content-type : " + getContentType("404.html") + CRLF;
+				entityBody = String.format(entityBody, requestResource);
 				responseLine = HTTP404;
 			}
 
@@ -193,9 +203,12 @@ public class HTTPRequest implements Runnable{
 	}
 
 	private void printSpecs(){
-		System.out.println("\n\n***************************************");
-		System.out.println("Remote Hostname : " + socket.getRemoteSocketAddress().toString());
-		System.out.println("***************************************");
+		System.out.println("\n\n****************Client Details***********************");
+		System.out.println("Request : " + requestLine);
+		System.out.println("Remote Client Hostname : " + socket.getRemoteSocketAddress().toString());
+		System.out.println("Protocol : TCP/IP");
+		System.out.println("Socket Type : Connection Oriented");
+		System.out.println("*****************************************************");
 	}
 
 	/**

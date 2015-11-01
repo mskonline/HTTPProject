@@ -4,4 +4,4 @@ if [ ! -f HTTPWebClient.class ]; then
     javac HTTPWebClient.java
 fi
 echo Starting HTTPWebClient...
-java -cp . HTTPWebClient $1 $2
+java -cp . HTTPWebClient $1 $2 $3

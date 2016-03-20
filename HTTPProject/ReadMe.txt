@@ -1,16 +1,16 @@
 ################################################################
-							README
+README
 
-				 Simple HTTP Web Server and HTTP Client
-				UTA FALL 15 - CSE 5334 003 Project 1
+Simple HTTP Web Server and HTTP Client
+UTA FALL 15 - CSE 5334 003 Project 1
 
 
-	Author(s) :-
-		Sai Kumar Manakan
-			Email : <saikumar.manakan@mavs.uta.edu>
-			UTA ID : 1001236131
+Author(s) :-
+	Sai Kumar Manakan
+	Email : <saikumar.manakan@mavs.uta.edu>
+	UTA ID : 1001236131
 
-	Submitted On: 10/31/2015
+Submitted On: 10/31/2015
 
 ################################################################
 
@@ -26,36 +26,36 @@ Contents :-
 
 1. Project Description
 
-	This project implements a simple multi threaded HTTP Server and a simple HTTP client using
-	the TCP/IP protocol provided by Java's Socket Implementation
+This project implements a simple multi threaded HTTP Server and a simple HTTP client using
+the TCP/IP protocol provided by Java's Socket Implementation
 
 ##################################################
 
 2. Installation
 
-	Unzip the 1001236131_Sai_Kumar_Manakan.zip to your desired location.
+Unzip the 1001236131_Sai_Kumar_Manakan.zip to your desired location.
 
 ##################################################
 
 3. Run
 
-	Prerequisite : Java 1.6 (or higher) needs to be installed in your system. The shell scripts
-				   which are run below will build the source files.
+Prerequisite : Java 1.6 (or higher) needs to be installed in your system. The shell scripts
+	which are run below will build the source files.
 
-	Server:
-		Navigate to <Project_Folder>/src/ and type the following command :-
+Server:
+Navigate to <Project_Folder>/src/ and type the following command :-
 
-			startHTTPWebServer.bat <port_number> // On Windows
-			or
-			sh startHTTPWebServer.sh <port_number> // On *nix
+	startHTTPWebServer.bat <port_number> // On Windows
+	or
+	sh startHTTPWebServer.sh <port_number> // On *nix
 
-	Client:
+Client:
 
-		Navigate to <Project_Folder>/src/ and type the following command :-
+Navigate to <Project_Folder>/src/ and type the following command :-
 
-			startHTTPWebClient.bat <host_name> <host_port> <resource> // On Windows
-			or
-			sh startHTTPWebClient.sh <host_name> <host_port> <resource> // On *nix
+	startHTTPWebClient.bat <host_name> <host_port> <resource> // On Windows
+		or
+	sh startHTTPWebClient.sh <host_name> <host_port> <resource> // On *nix
 
 ##################################################
 
@@ -72,8 +72,7 @@ Contents :-
 
 	Other files :
 
-		<Project_Folder>/src/ReadHeaders.html : Displays the HTTP Header information, when the
-												request is made from a browser
+	<Project_Folder>/src/ReadHeaders.html : Displays the HTTP Header information, when the request is made from a 		        browser
 		<Project_Folder>/src/404.html : Displays a 404 error detail
 		<Project_Folder>/src/Index.html : Displays a sample index page
 
